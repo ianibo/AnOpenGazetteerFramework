@@ -11,9 +11,8 @@ import au.com.bytecode.opencsv.CSVReader
 
 
 println("Initialise");
-def gNode = init();
-// org.elasticsearch.groovy.client.GClient esclient = esnode.getClient()
-def esclient = gNode.getClient()
+org.elasticsearch.groovy.node.GNode esnode = init();
+org.elasticsearch.groovy.client.GClient esclient = esnode.getClient()
 
 // Load file
 def FILENAME="uk_gaz_with_geo_no_tfr.csv"
@@ -30,39 +29,43 @@ println("All done");
 
 System.exit(0);
 
-def writeGazRecord(esclient, authority_id,id,type,place_name,fqn,alias,centroid_lat,centroid_lon) {
+
+// N.B. Prefixed parameters wit p_ so they don't clash with variables from the es index closure. Causes problems if they do!
+def writeGazRecord(esclient, p_authority_id,p_id,p_rtype,p_place_name,p_fqn,p_alias,p_centroid_lat,p_centroid_lon) {
 
   def rectype = "unknown"
-  switch ( type ) {
+  switch ( p_rtype ) {
     case "1. postcode":
-      rectype = "postcode";
+      rectype = 'postcode';
       break;
     case "3. Locality":
-      rectype = "locality";
+      rectype = 'locality';
       break;
   }
   
   def place_pojo = [
-        "type":type,
-        "authority":authority_id,
-        "placeName":place_name,
-        "fqn":fqn,
-        "aliases":[alias],
-        "lat":centroid_lat,
-        "lon":centroid_lon
+        "type":"${p_rtype}".toString(),
+        "authority":"${p_authority_id}".toString(),
+        "placeName":"${p_place_name}".toString(),
+        "fqn":"${p_fqn}".toString(),
+        "aliases":["${p_alias}".toString()],
+        "lat":"${p_centroid_lat}".toString(),
+        "lon":"${p_centroid_lon}".toString()
   ];
 
-  println("Indexing record of type ${rectype} with ID ${id}");
+  println("Indexing record of type ${rectype} with ID ${p_id}");
   try {
     def future = esclient.index {
       index "gaz"
-      type "${type}"
-      id "${id}"
+      type "${rectype}"
+      id id.toString()
       source place_pojo
     }
     println("Indexed respidx:$future.response.index/resptp:$future.response.type/respid:$future.response.id")
   }
   catch ( Exception e ) {
+    println("Problem: ${e}");
+    e.printStackTrace();
   }
   finally {
   }
