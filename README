@@ -1,0 +1,4 @@
+A project to manage the import of public licensed OS data and convert downloaded files to a 
+usable and updatable gazetteer. 
+
+Initial focus is on combining the latest codepoint open, Data: 1:50 000 Scale Gazetteer and OS Locator datasets
