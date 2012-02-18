@@ -16,6 +16,9 @@ public class Test {
     GNode esnode = inites();
     GClient esclient = esnode.getClient();
     resolvePlaceName(esclient, "S3 8PZ");
+    resolvePlaceName(esclient, "S3 8PZ, Paradise Street, SHEFFIELD, South Yorkshire, England, UK");
+    resolvePlaceName(esclient, "Ecclesall Road");
+    resolvePlaceName(esclient, "Main Street");
     esnode.stop().close();
     println("All done");
   }
@@ -63,6 +66,22 @@ public class Test {
 
     def result = search(esclient, "fqn.orig:\"${query_input}\"", 0, 10);
 
+    if ( result.response.hits.totalHits == 1 ) {
+      System.out.println("Exact match on fqn for ${query_input}");
+    }
+    else {
+      System.out.println("No exact fqn match for ${query_input}, try sub match");
+      result = search(esclient, "fqn:\"${query_input}\"", 0, 10);
+      System.out.println("Got ${result.response.hits} hits...");
+      if ( result.response.hits.totalHits > 0 ) {
+        println("Iterating hits...");
+        result.response.hits.each { hit -> 
+          println("Adding ${hit.source}");
+        }
+        println("Done Iterating hits...");
+      }
+    }
+
     // Try and do an exact place name match first of all
     // if ( response.getResults().getNumFound() == 1 ) {
     //   println "Exact place name match..."
@@ -108,9 +127,12 @@ public class Test {
     }
 
     def res = esclient.search(search_closure)
+    println "Search returned $res.response.hits.totalHits total hits"
+    // println "First hit course is $res.response.hits[0]"
+    // result.hits = search.response.hits
+    // result.resultsTotal = search.response.hits.totalHits
 
-    println "Search returned $search.response.hits.totalHits total hits"
-    println "First hit course is $search.response.hits[0]"
+
     //   result.hits = search.response.hits
     //   result.resultsTotal = search.response.hits.totalHits
     res
