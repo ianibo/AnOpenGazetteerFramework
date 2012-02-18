@@ -13,8 +13,6 @@ public class Loader {
     GNode esnode = inites();
     GClient esclient = esnode.getClient();
 
-    // Load file
-    // def FILENAME="uk_gaz_with_geo_no_tfr.csv"
     CSVReader r = new CSVReader( new InputStreamReader(getClass().classLoader.getResourceAsStream(filename)))
 
     String [] nl;
@@ -97,32 +95,9 @@ public class Loader {
         http {
           enabled = false
         }
-        // discovery {
-        //   zen {
-        //     minimum_master_nodes=1
-        //     ping {
-        //       unicast {
-        //         hosts = [ "localhost" ] 
-        //       }
-        //     }
-        //   }
-        // }
       }
   
       println("Constructing node...${nodeBuilder.getSettings().dump()}");
-  
-      // discovery {
-      //   zen {
-      //     minimum_master_nodes=3
-      //     ping_timeout="30s"
-      //     ping {
-      //       timeout=30
-      //       unicast {
-      //         hosts = [ "localhost" ] 
-      //       }
-      //     }
-      //   }
-      // }
   
     nodeBuilder.node()
   }
@@ -174,5 +149,5 @@ public class Loader {
         }
       }
   }
-  
+
 }
