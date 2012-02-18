@@ -123,10 +123,13 @@ public class Loader {
   def setup(esclient) {
       println("Writing mappings.. this will list mappings in browser: http://localhost:9200/gaz/_mapping?pretty=true");
 
+      println("Create gaz index");
       org.elasticsearch.groovy.client.GIndicesAdminClient index_admin_client = new org.elasticsearch.groovy.client.GIndicesAdminClient(esclient);
       def future = index_admin_client.create {
         index 'gaz'
       }
+
+      println("Register mappings");
 
       future = index_admin_client.putMapping {
         indices 'gaz'
@@ -137,7 +140,7 @@ public class Loader {
               fqn {
                 type = 'multi_field'
                 fields {
-                  fqnstr {
+                  orig {
                     type = 'string'
                     store = 'yes'
                     index = 'not_analyzed'
@@ -163,7 +166,7 @@ public class Loader {
               fqn {
                 type = 'multi_field'
                 fields {
-                  fqnstr {
+                  orig {
                     type = 'string'
                     store = 'yes'
                     index = 'not_analyzed'
@@ -189,7 +192,7 @@ public class Loader {
               fqn {
                 type = 'multi_field'
                 fields {
-                  fqnstr {
+                  orig {
                     type = 'string'
                     store = 'yes'
                     index = 'not_analyzed'
@@ -215,7 +218,7 @@ public class Loader {
               fqn {
                 type = 'multi_field'
                 fields {
-                  fqnstr {
+                  orig {
                     type = 'string'
                     store = 'yes'
                     index = 'not_analyzed'
@@ -232,6 +235,8 @@ public class Loader {
       }
       println("Installed town mappings");
 
+
+    println("Mappings installed, wait 10");
     synchronized(this) {
       this.sleep(10000);
     }

@@ -61,14 +61,7 @@ public class Test {
     // Step 1 : See if the input place name matches a fully qualified place name
     println "exact match q params: ${query_input}"
 
-    def result = search(esclient, query_input, 0, 10);
-
-    // ModifiableSolrParams solr_params = new ModifiableSolrParams();
-    // solr_params.set("q", "fqn:\"${query_input}\"")
-    // solr_params.set("start", 0);
-    // solr_params.set("rows", "10");
-
-    // def response = solrGazBean.query(solr_params);
+    def result = search(esclient, "fqn.orig:\"${query_input}\"", 0, 10);
 
     // Try and do an exact place name match first of all
     // if ( response.getResults().getNumFound() == 1 ) {
