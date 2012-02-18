@@ -12,5 +12,5 @@ import org.apache.log4j.*
 LogManager.rootLogger.level = Level.DEBUG
 
 def l = new Loader();
-l.load();
+l.load('uk_gaz_with_geo-2011-05-08.csv');
 

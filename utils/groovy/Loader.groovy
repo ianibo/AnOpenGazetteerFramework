@@ -8,23 +8,21 @@ import org.apache.log4j.*
 
 public class Loader {
 
-  public load() {
+  public load(filename) {
     println("Initialise");
     GNode esnode = inites();
-    GClient client = esnode.getClient();
-
-    println "\n\nClient is: ${client}\n\n"
+    GClient esclient = esnode.getClient();
 
     // Load file
     // def FILENAME="uk_gaz_with_geo_no_tfr.csv"
-    // CSVReader r = new CSVReader( new InputStreamReader(getClass().classLoader.getResourceAsStream(FILENAME)))
+    CSVReader r = new CSVReader( new InputStreamReader(getClass().classLoader.getResourceAsStream(filename)))
 
-    // String [] nl;
-    // while ((nl = r.readNext()) != null) {
+    String [] nl;
+    while ((nl = r.readNext()) != null) {
       // authority_id,id,type,place_name,fqn,alias,centroid_lat,centroid_lon
-      //   println "Processing authority:${nl[0]} identifier:${nl[1]} type:${nl[2]} place_name:${nl[3]} fqn:${nl[4]} alias:${nl[5]} lat:${nl[6]} lon:${nl[7]}"
-      //   writeGazRecord(esclient, nl[0],nl[1],nl[2],nl[3],nl[4],nl[5],nl[6],nl[7]);
-    // }
+      println "Processing authority:${nl[0]} identifier:${nl[1]} type:${nl[2]} place_name:${nl[3]} fqn:${nl[4]} alias:${nl[5]} lat:${nl[6]} lon:${nl[7]}"
+      writeGazRecord(esclient, nl[0],nl[1],nl[2],nl[3],nl[4],nl[5],nl[6],nl[7]);
+    }
 
     esnode.stop().close();
   
