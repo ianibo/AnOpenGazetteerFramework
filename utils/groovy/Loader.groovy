@@ -13,13 +13,18 @@ public class Loader {
     GNode esnode = inites();
     GClient esclient = esnode.getClient();
 
+    // To clear down the gaz: curl -XDELETE 'http://localhost:9200/gaz'
+
+    setup(esclient);
+
     CSVReader r = new CSVReader( new InputStreamReader(getClass().classLoader.getResourceAsStream(filename)))
 
     String [] nl;
     while ((nl = r.readNext()) != null) {
       // authority_id,id,type,place_name,fqn,alias,centroid_lat,centroid_lon
-      println "Processing authority:${nl[0]} identifier:${nl[1]} type:${nl[2]} place_name:${nl[3]} fqn:${nl[4]} alias:${nl[5]} lat:${nl[6]} lon:${nl[7]}"
-      writeGazRecord(esclient, nl[0],nl[1],nl[2],nl[3],nl[4],nl[5],nl[6],nl[7]);
+      // authority_id,id,type,place_name,display,fqn,alias,centroid_lat,centroid_lon
+      println "Processing authority:${nl[0]} identifier:${nl[1]} type:${nl[2]} place_name:${nl[3]} display:${nl[4]} fqn:${nl[5]} alias:${nl[6]} lat:${nl[7]} lon:${nl[8]}"
+      writeGazRecord(esclient, nl[0],nl[1],nl[2],nl[3],nl[4],nl[5],nl[6],nl[7],nl[8]);
     }
 
     esnode.stop().close();
@@ -29,25 +34,38 @@ public class Loader {
 
   
   // N.B. Prefixed parameters wit p_ so they don't clash with variables from the es index closure. Causes problems if they do!
-  def writeGazRecord(esclient, p_authority_id,p_id,p_rtype,p_place_name,p_fqn,p_alias,p_centroid_lat,p_centroid_lon) {
+  def writeGazRecord(esclient, p_authority_id,p_id,p_rtype,p_place_name,p_dispname, p_fqn,p_alias,p_centroid_lat,p_centroid_lon) {
   
     def rectype = "unknown"
+    def pref = 5
     switch ( p_rtype ) {
       case "1. postcode":
         rectype = 'postcode';
+        pref=1
+        break;
+      case "2. Thoroughfare":
+        rectype = 'thoroughfare';
+        pref=2
         break;
       case "3. Locality":
         rectype = 'locality';
+        pref=3
+        break;
+      case "4. PostTown":
+        rectype = 'posttown';
+        pref=4
         break;
     }
     
     def place_pojo = [
           "id":"${p_id}".toString(),
-          "type":"${p_rtype}".toString(),
+          "type":"${rectype}".toString(),
+          "pref":"${pref}".toString(),
           "authority":"${p_authority_id}".toString(),
           "placeName":"${p_place_name}".toString(),
-          "fqn":"${p_fqn}".toString(),
-          "aliases":["${p_alias}".toString()],
+          "fqn":"${p_dispname}".toString(),
+          // "prefixfqn":"${p_fqn}".toString(),
+          // "aliases":["${p_alias}".toString()],
           "lat":"${p_centroid_lat}".toString(),
           "lon":"${p_centroid_lon}".toString()
     ];
@@ -103,51 +121,120 @@ public class Loader {
   }
   
   def setup(esclient) {
-  
+      println("Writing mappings.. this will list mappings in browser: http://localhost:9200/gaz/_mapping?pretty=true");
+
       org.elasticsearch.groovy.client.GIndicesAdminClient index_admin_client = new org.elasticsearch.groovy.client.GIndicesAdminClient(esclient);
-      def future = index_admin_client.putMapping {
+      def future = index_admin_client.create {
+        index 'gaz'
+      }
+
+      future = index_admin_client.putMapping {
         indices 'gaz'
         type 'postcode'
         source {
-          postcode {       // Think this is the name of the mapping within the type
+          gazmap {
             properties {
-              title { // We declare a multi_field mapping so we can have a default "title" search with stemming, and an untouched title via origtitle
+              fqn {
                 type = 'multi_field'
                 fields {
-                  title {
-                    type = 'string'
-                    analyzer = 'snowball'
-                  }
-                  origtitle {
-                    type = 'string'
-                    store = 'yes'
-                  }
-                }
-              }
-              subject {
-                type = 'multi_field'
-                fields {
-                  subject {
+                  fqnstr {
                     type = 'string'
                     store = 'yes'
                     index = 'not_analyzed'
                   }
-                  subjectKw {
+                  fqn {
                     type = 'string'
-                    analyzer = 'snowball'
+                    // analyzer = 'snowball'
                   }
                 }
-  
-              }
-              provid {
-                type = 'string'
-                store = 'yes'
-                index = 'not_analyzed'
               }
             }
           }
         }
       }
+      println("Installed postcode mappings");
+
+      future = index_admin_client.putMapping {
+        indices 'gaz'
+        type 'thoroughfare'
+        source {
+          gazmap {
+            properties {
+              fqn {
+                type = 'multi_field'
+                fields {
+                  fqnstr {
+                    type = 'string'
+                    store = 'yes'
+                    index = 'not_analyzed'
+                  }
+                  fqn {
+                    type = 'string'
+                    // analyzer = 'snowball'
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      println("Installed tfr mappings");
+
+      future = index_admin_client.putMapping {
+        indices 'gaz'
+        type 'locality'
+        source {
+          gazmap {
+            properties {
+              fqn {
+                type = 'multi_field'
+                fields {
+                  fqnstr {
+                    type = 'string'
+                    store = 'yes'
+                    index = 'not_analyzed'
+                  }
+                  fqn {
+                    type = 'string'
+                    // analyzer = 'snowball'
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      println("Installed locality mappings");
+
+      future = index_admin_client.putMapping {
+        indices 'gaz'
+        type 'posttown'
+        source {
+          gazmap {
+            properties {
+              fqn {
+                type = 'multi_field'
+                fields {
+                  fqnstr {
+                    type = 'string'
+                    store = 'yes'
+                    index = 'not_analyzed'
+                  }
+                  fqn {
+                    type = 'string'
+                    // analyzer = 'snowball'
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      println("Installed town mappings");
+
+    synchronized(this) {
+      this.sleep(10000);
+    }
   }
 
 }
