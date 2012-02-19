@@ -56,6 +56,9 @@ public class Loader {
         pref=4
         break;
     }
+
+    double lat = Double.parseDouble(p_centroid_lat);
+    double lon = Double.parseDouble(p_centroid_lon);
     
     def place_pojo = [
           "id":"${p_id}".toString(),
@@ -66,8 +69,10 @@ public class Loader {
           "fqn":"${p_dispname}".toString(),
           // "prefixfqn":"${p_fqn}".toString(),
           // "aliases":["${p_alias}".toString()],
-          "lat":"${p_centroid_lat}".toString(),
-          "lon":"${p_centroid_lon}".toString()
+          location : [
+            "lat":p_centroid_lat,
+            "lon":p_centroid_lon
+          ]
     ];
   
     println("Indexing record of type ${rectype} with ID ${p_id}");
@@ -151,6 +156,9 @@ public class Loader {
                   }
                 }
               }
+              location {
+                type='geo_point'
+              }
             }
           }
         }
@@ -176,6 +184,9 @@ public class Loader {
                     // analyzer = 'snowball'
                   }
                 }
+              }
+              location {
+                type='geo_point'
               }
             }
           }
@@ -203,6 +214,9 @@ public class Loader {
                   }
                 }
               }
+              location {
+                type='geo_point'
+              }
             }
           }
         }
@@ -228,6 +242,9 @@ public class Loader {
                     // analyzer = 'snowball'
                   }
                 }
+              }
+              location {
+                type='geo_point'
               }
             }
           }
