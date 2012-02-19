@@ -99,6 +99,7 @@ public class Loader {
   
       org.elasticsearch.groovy.node.GNodeBuilder nodeBuilder = new org.elasticsearch.groovy.node.GNodeBuilder()
   
+      nodeBuilder.
       println("Construct node settings");
   
       org.elasticsearch.groovy.common.xcontent.GXContentBuilder gxc = new org.elasticsearch.groovy.common.xcontent.GXContentBuilder();

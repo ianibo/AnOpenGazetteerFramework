@@ -68,6 +68,14 @@ public class Test {
 
     if ( result.response.hits.totalHits == 1 ) {
       System.out.println("Exact match on fqn for ${query_input}");
+      def sr = [
+           'lat':result.response.hits[0].source.location?.lat,
+           'lon':result.response.hits[0].source.location?.lon,
+           'name':result.response.hits[0].source.placeName,
+           'fqn':result.response.hits[0].source.fqn,
+           'type':result.response.hits[0].source.type
+      ]
+      gazresp.places.add(sr)
     }
     else {
       System.out.println("No exact fqn match for ${query_input}, try sub match");
@@ -77,37 +85,17 @@ public class Test {
         println("Iterating hits...");
         result.response.hits.each { hit -> 
           println("Adding ${hit.source}");
+          gazresp.places.add([
+           'lat':hit.source.location?.lat,
+           'lon':hit.source.location?.lon,
+           'name':hit.source.placeName,
+           'fqn':hit.source.fqn,
+           'type':hit.source.type
+          ] )
         }
         println("Done Iterating hits...");
       }
     }
-
-    // Try and do an exact place name match first of all
-    // if ( response.getResults().getNumFound() == 1 ) {
-    //   println "Exact place name match..."
-    //   def doc = response.getResults().get(0);
-    //   def sr = ['lat':doc['centroid_lat'],'lon':doc['centroid_lon'], 'name':doc['place_name'], 'fqn':doc['fqn'], 'type':doc['type'], 'alias':doc['alaias']]
-    //   gazresp.places.add(sr)
-    // }
-    // else {
-      // Doing text match on place name...
-    //   solr_params.set("q", "place_name:(${query_input}) OR alias:(${query_input})");
-    //   solr_params.set("sort", "type desc, score desc");
-
-    //   println "Attempting generic place name match ${solr_params}"
-    //   response = solrGazBean.query(solr_params);
-    //   response.getResults().each { doc ->
-    //     def sr = ['lat':doc['centroid_lat'],'lon':doc['centroid_lon'], 'name':doc['place_name'], 'fqn':doc['fqn'], 'type':doc['type'], 'alias':doc['alaias']]
-    //     gazresp.places.add(sr)
-    //   }
-    // }
-
-    // if ( gazresp.places.size() > 0 ) {
-      // Remove any instances of postcode or alias from the query
-    //   gazresp.newq = "${query_input}"
-    //   gazresp.newq = query_input.replaceAll("${gazresp.places[0].name}","")
-    //   gazresp.newq = gazresp.newq.replaceAll("${gazresp.places[0].alias}","")
-    // }
 
     gazresp
   }
