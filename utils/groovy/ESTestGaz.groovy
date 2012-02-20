@@ -11,6 +11,7 @@ import org.apache.log4j.*
 
 LogManager.rootLogger.level = Level.DEBUG
 
+// http://localhost:9200/gaz/_search?q=%22Brincliffe%20Edge%20Road%22&sort=type:desc&pretty=true
 def t = new Test();
 t.dotest();
 
