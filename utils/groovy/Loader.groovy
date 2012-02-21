@@ -143,6 +143,9 @@ public class Loader {
         source {
           gazmap {
             properties {
+              pref {
+                type = 'string';
+              }
               fqn {
                 type = 'multi_field'
                 fields {
@@ -172,6 +175,9 @@ public class Loader {
         source {
           gazmap {
             properties {
+              pref {
+                type = 'string';
+              }
               fqn {
                 type = 'multi_field'
                 fields {
@@ -201,6 +207,9 @@ public class Loader {
         source {
           gazmap {
             properties {
+              pref {
+                type = 'string';
+              }
               fqn {
                 type = 'multi_field'
                 fields {
@@ -230,6 +239,9 @@ public class Loader {
         source {
           gazmap {
             properties {
+              pref {
+                type = 'string';
+              }
               fqn {
                 type = 'multi_field'
                 fields {
