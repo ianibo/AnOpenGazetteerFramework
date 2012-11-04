@@ -66,7 +66,9 @@ public class Loader {
           "pref":"${pref}".toString(),
           "authority":"${p_authority_id}".toString(),
           "placeName":"${p_place_name}".toString(),
+          "alias":"${p_alias}".toString(),
           "fqn":"${p_dispname}".toString(),
+          "timestamp":System.currentTimeMillis(),
           // "prefixfqn":"${p_fqn}".toString(),
           // "aliases":["${p_alias}".toString()],
           location : [
